@@ -6,15 +6,17 @@ namespace BookBlend.Api.Entities
     {
         public Guid Id { get; set; }
 
-        [Required] [MaxLength(200)] public string Title { get; set; }
+        [Required]
+        [MaxLength(200)]
+        public string Title { get; set; }
 
         public TimeSpan Duration { get; set; }
 
-        [Required] public Guid AudiobookId { get; set; }
+        public Guid AudiobookId { get; set; }
 
         public Audiobook Audiobook { get; set; }
 
-        [Required] public Guid AudioFileId { get; set; }
+        public Guid AudioFileId { get; set; }
 
         public AudiobookFile AudioFile { get; set; }
 

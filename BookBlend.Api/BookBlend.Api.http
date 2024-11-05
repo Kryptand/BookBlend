@@ -1,6 +1,8 @@
 @BookBlend.Api_HostAddress = http://localhost:5191
 
-GET {{BookBlend.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{BookBlend.Api_HostAddress}}/api/v1/scan-directory
+Content-Type: application/json
+{
+  "directoryPath": "C:\\Users\\user\\Desktop\\Books"
+}
 
-###

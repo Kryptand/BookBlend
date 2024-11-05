@@ -31,7 +31,10 @@ public class AudiobookDbContext(DbContextOptions<AudiobookDbContext> options) : 
     private static void CreateChapterAudioFileConfiguration(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Chapter>().HasKey(c => c.Id);
-        modelBuilder.Entity<Chapter>().HasOne(c => c.AudioFile).WithOne().HasForeignKey<Chapter>(af => af.AudioFileId);
+        modelBuilder.Entity<Chapter>()
+            .HasOne(c => c.Audiobook)
+            .WithMany(a => a.Chapters)
+            .HasForeignKey(c => c.AudiobookId);
         modelBuilder.Entity<Chapter>().HasIndex(c => c.AudioFileId).IsUnique();
     }
 
