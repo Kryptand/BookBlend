@@ -1,21 +1,27 @@
 using BookBlend.Api.Database;
 using BookBlend.Api.Entities;
+using BookBlend.Api.Features.LibrarySettings.SetLibrarySettings.Services;
 using BookBlend.Api.Shared;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+
 namespace BookBlend.Api.Features.LibrarySettings.SetLibrarySettings.Commands
 {
     public sealed class SetLibrarySettingsCommandHandler : IRequestHandler<SetLibrarySettingsCommand, Result>
     {
         private readonly AudiobookDbContext _dbContext;
         private readonly IValidator<SetLibrarySettingsCommand> _validator;
+        private readonly ILibraryPathValidatorService _libraryPathValidatorService;
 
         public SetLibrarySettingsCommandHandler(
             AudiobookDbContext dbContext,
-            IValidator<SetLibrarySettingsCommand> validator)
+            IValidator<SetLibrarySettingsCommand> validator,
+            ILibraryPathValidatorService libraryPathValidatorService)
         {
             _dbContext = dbContext;
             _validator = validator;
+            _libraryPathValidatorService = libraryPathValidatorService;
         }
 
         public async Task<Result> Handle(SetLibrarySettingsCommand request, CancellationToken cancellationToken)
@@ -25,8 +31,15 @@ namespace BookBlend.Api.Features.LibrarySettings.SetLibrarySettings.Commands
             {
                 return Result.Failure(new Error("SetLibrarySettings.Validation", validationResult.ToString()));
             }
-
-            var settings = await _dbContext.LibrarySettings.FindAsync(1, cancellationToken);
+            
+            var hasInvalidPaths = request.Paths.Any(path=>!_libraryPathValidatorService.ValidatePath(path));
+            
+            if (hasInvalidPaths)
+            {
+                return Result.Failure(new Error("SetLibrarySettings.Validation", "Invalid path"));
+            }
+            
+            var settings = await _dbContext.LibrarySettings.FirstOrDefaultAsync(cancellationToken);
 
             if (settings == null)
             {

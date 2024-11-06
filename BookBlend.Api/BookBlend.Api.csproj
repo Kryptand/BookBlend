@@ -32,7 +32,6 @@
       <Folder Include="Features\AudiobookConversion\" />
       <Folder Include="Features\AudiobookManagement\" />
       <Folder Include="Features\FileManagement\MetadataManagement\" />
-      <Folder Include="Features\LibrarySettings\LibraryPaths\" />
     </ItemGroup>
 
 </Project>

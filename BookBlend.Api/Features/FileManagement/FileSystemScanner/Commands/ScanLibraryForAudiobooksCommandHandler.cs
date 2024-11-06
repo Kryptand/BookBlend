@@ -10,19 +10,12 @@ namespace BookBlend.Api.Features.FileManagement.FileSystemScanner.Commands
 {
     public class ScanLibraryForAudiobooksCommandHandler(
         IFileScannerService fileScannerService,
-        IValidator<ScanLibraryForAudiobooksCommand> validator,
         AudiobookDbContext dbContext) : IRequestHandler<ScanLibraryForAudiobooksCommand, Result<ScanLibraryForAudiobooksCommandResult>>
     {
         public async Task<Result<ScanLibraryForAudiobooksCommandResult>> Handle(ScanLibraryForAudiobooksCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
-            if (!validationResult.IsValid)
-            {
-                return Result.Failure<ScanLibraryForAudiobooksCommandResult>(new Error(
-                    "ScanLibraryForAudiobooks.Validation", validationResult.ToString()));
-            }
-
             var libraryPaths = await dbContext.LibraryPaths.ToListAsync(cancellationToken);
+           
             if (!libraryPaths.Any())
             {
                 return Result.Failure<ScanLibraryForAudiobooksCommandResult>(new Error(
