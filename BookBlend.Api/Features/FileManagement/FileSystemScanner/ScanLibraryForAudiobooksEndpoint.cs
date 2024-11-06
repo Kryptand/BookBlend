@@ -9,9 +9,9 @@ public class ScanLibraryForAudiobooksEndpoint: CarterModule
 {
     public override void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/v1/scan-library", async (ScanLibraryForAudiobooksCommand command, ISender sender) =>
+        app.MapPost("/api/v1/scan-library", async (ISender sender) =>
         {
-            var result = await sender.Send(command);
+            var result = await sender.Send(new ScanLibraryForAudiobooksCommand());
                 
             return result.IsFailure ? result.ToProblemDetails() : Results.Ok(result.Value);
         });

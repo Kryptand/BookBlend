@@ -9,7 +9,7 @@ public class SetLibrarySettingsEndpoint : CarterModule
 {
     public override void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/library-settings", async (SetLibrarySettingsCommand command, ISender sender) =>
+        app.MapPost("/api/v1/library-settings", async (SetLibrarySettingsCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
 

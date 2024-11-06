@@ -1,5 +1,6 @@
 using BookBlend.Api.Database;
 using BookBlend.Api.Extensions;
+using BookBlend.Api.Features.AudiobookManagement.MatchAudiobooks.Services;
 using BookBlend.Api.Features.FileManagement.FileSystemScanner.Services;
 using BookBlend.Api.Features.LibrarySettings.SetLibrarySettings.Services;
 using BookBlend.Api.Middleware;
@@ -38,6 +39,14 @@ builder.Services.AddTransient<IFileSystemWrapper, FileSystemWrapper>();
 builder.Services.AddTransient<ILibraryPathValidatorService, LibraryPathValidatorService>();
 builder.Services.AddTransient<IFileScannerService, FileScannerService>();
 builder.Services.AddTransient<IMapFileToAudiobookFile, MapFileToAudiobookFile>();
+builder.Services.AddTransient<IAudiobookFilesMatcherService, AudiobookFilesMatcherService>();
+builder.Services.AddTransient<IAudiobookFileMapper, AudiobookFileMapper>();
+builder.Services.AddTransient<IAudiobookCreatorFactory, AudiobookCreatorFactory>();
+builder.Services.AddTransient<IAudiobookEnricherService, AudiobookEnricherService>();
+builder.Services.AddTransient<AudiobookTitleHelper>();
+builder.Services.AddTransient<FileNameHelper>();
+
+
 
 builder.Services.AddValidatorsFromAssembly(assembly);
 builder.Services.AddCarter();
