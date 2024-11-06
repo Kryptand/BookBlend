@@ -1,6 +1,7 @@
 using BookBlend.Api.Database;
 using BookBlend.Api.Extensions;
 using BookBlend.Api.Features.FileManagement.FileSystemScanner.Services;
+using BookBlend.Api.Features.LibrarySettings.LibraryPaths.Shared.Services;
 using BookBlend.Api.Middleware;
 using BookBlend.Api.Shared;
 using Carter;
@@ -39,6 +40,7 @@ builder.Services.AddValidatorsFromAssembly(assembly);
 builder.Services.AddTransient<IFileScannerService, FileScannerService>();
 builder.Services.AddTransient<IFileSystemWrapper, FileSystemWrapper>();
 builder.Services.AddTransient<IMapFileToAudiobookFile, MapFileToAudiobookFile>();
+builder.Services.AddTransient<ILibraryPathValidatorService, LibraryPathValidatorService>();
 
 var app = builder.Build();
 

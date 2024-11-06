@@ -2,15 +2,14 @@ using BookBlend.Api.Extensions;
 using BookBlend.Api.Features.FileManagement.FileSystemScanner.Commands;
 using Carter;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BookBlend.Api.Features.FileManagement.FileSystemScanner;
 
-public class ScanDirectoryForAudiobooksEndpoint: CarterModule
+public class ScanLibraryForAudiobooksEndpoint: CarterModule
 {
     public override void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/v1/scan-directory", async (ScanDirectoryForAudiobooksCommand command, ISender sender) =>
+        app.MapPost("/api/v1/scan-library", async (ScanLibraryForAudiobooksCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
                 

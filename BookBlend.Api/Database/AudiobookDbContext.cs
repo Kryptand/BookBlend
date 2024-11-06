@@ -11,14 +11,33 @@ public class AudiobookDbContext(DbContextOptions<AudiobookDbContext> options) : 
 
     public DbSet<FileMetadata> FileMetadata { get; set; }
 
+    public DbSet<LibraryPath> LibraryPaths { get; set; }
+    
+    public DbSet<LibrarySettings> LibrarySettings { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         CreateAudiobookChapterConfiguration(modelBuilder);
         CreateChapterAudioFileConfiguration(modelBuilder);
         CreateAudiobookFileConfiguration(modelBuilder);
         CreateFileMetadataConfiguration(modelBuilder);
+        CreateLibraryPathConfiguration(modelBuilder);
+        CreateLibrarySettingsConfiguration(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
+    }
+
+    private static void CreateLibraryPathConfiguration(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<LibraryPath>().HasKey(lp => lp.Id);
+        modelBuilder.Entity<LibraryPath>().HasOne<LibrarySettings>(lp => lp.LibrarySettings).WithMany(ls => ls.Paths)
+            .HasForeignKey(lp => lp.LibrarySettingsId);
+    }
+    
+    private static void CreateLibrarySettingsConfiguration(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<LibrarySettings>().HasKey(ls => ls.Id);
+        modelBuilder.Entity<LibrarySettings>().HasMany<LibraryPath>(ls => ls.Paths).WithOne().HasForeignKey(lp => lp.LibrarySettingsId);
     }
 
 
