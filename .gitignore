@@ -3,4 +3,4 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
-/BookBlend.Api/*.db
+/BookBlend.Api/FileManagement.db
