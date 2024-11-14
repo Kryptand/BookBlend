@@ -10,11 +10,10 @@ public class AudiobookDbContext(DbContextOptions<AudiobookDbContext> options) : 
     public DbSet<Chapter> Chapters { get; set; }
 
     public DbSet<FileMetadata> FileMetadata { get; set; }
-
     public DbSet<LibraryPath> LibraryPaths { get; set; }
-    
     public DbSet<LibrarySettings> LibrarySettings { get; set; }
-    
+    public DbSet<ConversionJob> ConversionJobs { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         CreateAudiobookChapterConfiguration(modelBuilder);
@@ -23,21 +22,30 @@ public class AudiobookDbContext(DbContextOptions<AudiobookDbContext> options) : 
         CreateFileMetadataConfiguration(modelBuilder);
         CreateLibraryPathConfiguration(modelBuilder);
         CreateLibrarySettingsConfiguration(modelBuilder);
+        CreateConversionJobConfiguration(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
+    }
+
+    private void CreateConversionJobConfiguration(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ConversionJob>().HasKey(cj => cj.Id);
     }
 
     private static void CreateLibraryPathConfiguration(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<LibraryPath>().HasKey(lp => lp.Id);
-        modelBuilder.Entity<LibraryPath>().HasOne<LibrarySettings>(lp => lp.LibrarySettings).WithMany(ls => ls.Paths)
+        modelBuilder.Entity<LibraryPath>().HasOne(lp => lp.LibrarySettings)
+            .WithMany(ls => ls.Paths)
             .HasForeignKey(lp => lp.LibrarySettingsId);
     }
-    
+
     private static void CreateLibrarySettingsConfiguration(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<LibrarySettings>().HasKey(ls => ls.Id);
-        modelBuilder.Entity<LibrarySettings>().HasMany<LibraryPath>(ls => ls.Paths).WithOne().HasForeignKey(lp => lp.LibrarySettingsId);
+        modelBuilder.Entity<LibrarySettings>().HasMany(ls => ls.Paths)
+            .WithOne(lp => lp.LibrarySettings)
+            .HasForeignKey(lp => lp.LibrarySettingsId);
     }
 
 

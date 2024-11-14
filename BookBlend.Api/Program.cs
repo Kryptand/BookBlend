@@ -1,5 +1,7 @@
 using BookBlend.Api.Database;
 using BookBlend.Api.Extensions;
+using BookBlend.Api.Features.AudiobookConversion.ConvertAndMergeToM4a;
+using BookBlend.Api.Features.AudiobookConversion.ConvertAndMergeToM4a.Services;
 using BookBlend.Api.Features.AudiobookManagement.MatchAudiobooks.Services;
 using BookBlend.Api.Features.FileManagement.FileSystemScanner.Services;
 using BookBlend.Api.Features.LibrarySettings.SetLibrarySettings.Services;
@@ -30,8 +32,10 @@ builder.Services.AddDbContext<AudiobookDbContext>(options =>
 
 var assembly = typeof(Program).Assembly;
 
-builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(assembly));
-
+if(builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSingleton<IStartupFilter>(sp => new StartupFilter(builder.Services));
+}
 
 
 // Register your services
@@ -45,10 +49,18 @@ builder.Services.AddTransient<IAudiobookCreatorFactory, AudiobookCreatorFactory>
 builder.Services.AddTransient<IAudiobookEnricherService, AudiobookEnricherService>();
 builder.Services.AddTransient<AudiobookTitleHelper>();
 builder.Services.AddTransient<FileNameHelper>();
+builder.Services.AddTransient<IAudiobookMetadataToM4AMetadataMapper, AudiobookMetadataToM4AMetadataMapper>();
+builder.Services.AddTransient<ICombineFilesIntoM4AService, CombineFilesIntoM4AService>();
+builder.Services.AddTransient<IFFmpegService, FFmpegService>();
 
-
+foreach (var registeredAssembly in AppDomain.CurrentDomain.GetAssemblies())
+{
+    builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(registeredAssembly));
+}
 
 builder.Services.AddValidatorsFromAssembly(assembly);
+builder.Services.AddHostedService<PeriodicallyCheckForNewConversionJobs>();
+
 builder.Services.AddCarter();
 
 

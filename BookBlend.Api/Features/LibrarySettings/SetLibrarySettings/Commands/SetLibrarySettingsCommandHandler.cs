@@ -8,53 +8,49 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookBlend.Api.Features.LibrarySettings.SetLibrarySettings.Commands
 {
-    public sealed class SetLibrarySettingsCommandHandler : IRequestHandler<SetLibrarySettingsCommand, Result>
+    public sealed class SetLibrarySettingsCommandHandler(
+        AudiobookDbContext dbContext,
+        IValidator<SetLibrarySettingsCommand> validator,
+        ILibraryPathValidatorService libraryPathValidatorService)
+        : IRequestHandler<SetLibrarySettingsCommand, Result>
     {
-        private readonly AudiobookDbContext _dbContext;
-        private readonly IValidator<SetLibrarySettingsCommand> _validator;
-        private readonly ILibraryPathValidatorService _libraryPathValidatorService;
-
-        public SetLibrarySettingsCommandHandler(
-            AudiobookDbContext dbContext,
-            IValidator<SetLibrarySettingsCommand> validator,
-            ILibraryPathValidatorService libraryPathValidatorService)
-        {
-            _dbContext = dbContext;
-            _validator = validator;
-            _libraryPathValidatorService = libraryPathValidatorService;
-        }
-
         public async Task<Result> Handle(SetLibrarySettingsCommand request, CancellationToken cancellationToken)
         {
-            var validationResult = _validator.Validate(request);
+            var validationResult = validator.Validate(request);
             if (!validationResult.IsValid)
             {
                 return Result.Failure(new Error("SetLibrarySettings.Validation", validationResult.ToString()));
             }
             
-            var hasInvalidPaths = request.Paths.Any(path=>!_libraryPathValidatorService.ValidatePath(path));
+            var hasInvalidOutputDirectory = !libraryPathValidatorService.ValidatePath(request.OutputDirectory);
             
-            if (hasInvalidPaths)
+            if (hasInvalidOutputDirectory)
             {
-                return Result.Failure(new Error("SetLibrarySettings.Validation", "Invalid path"));
+                return Result.Failure(new Error("SetLibrarySettings.Validation", "Invalid output directory"));
             }
             
-            var settings = await _dbContext.LibrarySettings.FirstOrDefaultAsync(cancellationToken);
+            var invalidPaths = request.Paths.FindAll(path=>!libraryPathValidatorService.ValidatePath(path));
+            
+            if (invalidPaths.Any())
+            {
+                return Result.Failure(new Error("SetLibrarySettings.Validation", "Invalid library paths found: " + string.Join(", ", invalidPaths)));
+            }
+            
+            var settings = await dbContext.LibrarySettings.FirstOrDefaultAsync(cancellationToken);
 
             if (settings == null)
             {
                 settings = new Entities.LibrarySettings();
-                await _dbContext.LibrarySettings.AddAsync(settings, cancellationToken);
+                await dbContext.LibrarySettings.AddAsync(settings, cancellationToken);
             }
 
             settings.Paths = request.Paths.Select(path => new LibraryPath { Path = path }).ToList();
+            
+            settings.OutputDirectory = request.OutputDirectory;
 
-            if (request.DefaultLanguage != null)
-            {
-                settings.DefaultLanguage = request.DefaultLanguage;
-            }
+            settings.DefaultLanguage = request.DefaultLanguage;
 
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
             
             return Result.Success();
         }

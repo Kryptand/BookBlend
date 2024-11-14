@@ -139,6 +139,46 @@ namespace BookBlend.Api.Migrations
                     b.ToTable("Chapters");
                 });
 
+            modelBuilder.Entity("BookBlend.Api.Entities.ConversionJob", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.PrimitiveCollection<string>("AudiobookIdsToConvert")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ConfiguredOutputDirectory")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CurrentAudiobookId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("FinishedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ConversionJobs");
+                });
+
             modelBuilder.Entity("BookBlend.Api.Entities.FileMetadata", b =>
                 {
                     b.Property<Guid>("Id")
@@ -202,9 +242,6 @@ namespace BookBlend.Api.Migrations
                     b.Property<Guid>("LibrarySettingsId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("LibrarySettingsId1")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Path")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -212,8 +249,6 @@ namespace BookBlend.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LibrarySettingsId");
-
-                    b.HasIndex("LibrarySettingsId1");
 
                     b.ToTable("LibraryPaths");
                 });
@@ -225,6 +260,10 @@ namespace BookBlend.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DefaultLanguage")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OutputDirectory")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -265,15 +304,11 @@ namespace BookBlend.Api.Migrations
 
             modelBuilder.Entity("BookBlend.Api.Entities.LibraryPath", b =>
                 {
-                    b.HasOne("BookBlend.Api.Entities.LibrarySettings", null)
+                    b.HasOne("BookBlend.Api.Entities.LibrarySettings", "LibrarySettings")
                         .WithMany("Paths")
                         .HasForeignKey("LibrarySettingsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("BookBlend.Api.Entities.LibrarySettings", "LibrarySettings")
-                        .WithMany()
-                        .HasForeignKey("LibrarySettingsId1");
 
                     b.Navigation("LibrarySettings");
                 });

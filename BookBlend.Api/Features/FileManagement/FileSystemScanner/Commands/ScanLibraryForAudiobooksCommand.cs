@@ -1,8 +1,5 @@
-using BookBlend.Api.Database;
 using BookBlend.Api.Shared;
-using FluentValidation;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace BookBlend.Api.Features.FileManagement.FileSystemScanner.Commands;
 

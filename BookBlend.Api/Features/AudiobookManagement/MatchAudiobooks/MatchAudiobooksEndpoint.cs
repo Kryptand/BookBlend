@@ -1,6 +1,5 @@
 using BookBlend.Api.Extensions;
 using BookBlend.Api.Features.AudiobookManagement.MatchAudiobooks.Commands;
-using BookBlend.Api.Features.LibrarySettings.SetLibrarySettings.Commands;
 using Carter;
 using MediatR;
 
