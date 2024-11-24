@@ -17,7 +17,7 @@ public sealed class CombineFilesIntoM4AService(
             var outputFullPath = GetOutputFullPath(outputFilePath, audiobook);
 
             logger.LogInformation("Converting MP3 files to M4A.");
-            await ConvertMp3FilesToM4A(mp3Files, m4APartPaths);
+            await ConvertMp3FilesToM4A(mp3Files, m4APartPaths, outputFilePath);
 
             logger.LogInformation("Concatenating M4A files.");
             await ffmpegService.ConcatenateM4AFiles(m4APartPaths, outputFullPath);
@@ -46,15 +46,24 @@ public sealed class CombineFilesIntoM4AService(
         return Path.Combine(outputFilePath, $"{outputFileName}.m4a");
     }
 
-    private async Task ConvertMp3FilesToM4A(IEnumerable<string> mp3Files, List<string> m4APartPaths)
+    private async Task ConvertMp3FilesToM4A(IEnumerable<string> mp3Files, List<string> m4APartPaths,
+        string outputFilePath)
     {
-        var convertTasks = mp3Files.Select(async mp3File =>
+        var tasks = new List<Task>();
+
+        Parallel.ForEach(mp3Files, mp3File =>
         {
-            var tempM4AFilePath = Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(mp3File)}.m4a");
-            var m4APartPath = await ffmpegService.ConvertMp3ToM4A(mp3File, tempM4AFilePath);
-            m4APartPaths.Add(m4APartPath);
+            tasks.Add(Task.Run(async () =>
+            {
+                var tempM4AFilePath = $"{outputFilePath}/{Guid.NewGuid()}.m4a";
+                var m4APartPath = await ffmpegService.ConvertMp3ToM4A(mp3File, tempM4AFilePath);
+                lock (m4APartPaths)
+                {
+                    m4APartPaths.Add(m4APartPath);
+                }
+            }));
         });
 
-        await Task.WhenAll(convertTasks);
+        await Task.WhenAll(tasks);
     }
 }

@@ -26,9 +26,9 @@ namespace BookBlend.Api.Features.AudiobookConversion.ConvertAndMergeToM4a.Servic
             await FFmpeg.Conversions.New()
                 .AddParameter("-f concat", ParameterPosition.PreInput)
                 .AddParameter($"-i \"{tempFile.FilePath}\"")
-                .AddParameter("-c copy")
-                .AddParameter("-y")
+                .AddParameter("-safe 0")
                 .SetOutput(outputM4AFilePath)
+                .SetOverwriteOutput(true)
                 .Start();
 
             return outputM4AFilePath;
@@ -53,6 +53,7 @@ namespace BookBlend.Api.Features.AudiobookConversion.ConvertAndMergeToM4a.Servic
                 .SetOutput(inputM4AFilePath)
                 .SetOverwriteOutput(true)
                 .Start();
+            
         }
 
         public async Task<string> ConvertMp3ToM4A(string inputMp3FilePath, string outputM4AFilePath)
@@ -64,6 +65,13 @@ namespace BookBlend.Api.Features.AudiobookConversion.ConvertAndMergeToM4a.Servic
                 .SetOutput(outputM4AFilePath)
                 .SetOverwriteOutput(true)
                 .Start();
+
+            var fileInfo = new FileInfo(outputM4AFilePath)
+            {
+                IsReadOnly = false
+            };
+            
+            fileInfo.Attributes &= ~FileAttributes.ReadOnly;
 
             return outputM4AFilePath;
         }
