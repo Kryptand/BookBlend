@@ -10,14 +10,7 @@ namespace BookBlend.Api.Features.AudiobookConversion.ConvertAndMergeToM4a.Servic
         {
             EnsureFFmpegDownloaded();
         }
-
-        public async Task ConcatenateMp3Files(string concatFilePath, string tempMp3File)
-        {
-            await FFmpeg.Conversions.New()
-                .AddParameter($"-f concat -safe 0 -i \"{concatFilePath}\" -c copy \"{tempMp3File}\"")
-                .Start();
-        }
-
+        
         public async Task<string> ConcatenateM4AFiles(IEnumerable<string> m4AFilePaths, string outputM4AFilePath)
         {
             using var tempFile = new TempFile();
@@ -25,34 +18,39 @@ namespace BookBlend.Api.Features.AudiobookConversion.ConvertAndMergeToM4a.Servic
 
             await FFmpeg.Conversions.New()
                 .AddParameter("-f concat", ParameterPosition.PreInput)
-                .AddParameter($"-i \"{tempFile.FilePath}\"")
                 .AddParameter("-safe 0")
+                .AddParameter($"-i \"{tempFile.FilePath}\"")
+                .AddParameter("-map 0:a") 
+                .AddParameter("-c copy") 
                 .SetOutput(outputM4AFilePath)
                 .SetOverwriteOutput(true)
                 .Start();
-
+            
             return outputM4AFilePath;
         }
 
-        public bool IsFFmpegDownloaded()
+        private bool IsFFmpegDownloaded()
         {
             var ffmpegExecutable = Path.Combine(FFmpegPath, "ffmpeg");
             return File.Exists(ffmpegExecutable);
         }
 
-        public async Task AddMetadataToM4A(string inputM4AFilePath, string chapterMetadata)
+        public async Task AddChapterMarksToM4A(string inputM4AFilePath, string chapterMetadata)
         {
-            using var metadataTempFile = new TempFile();
+           using var metadataTempFile = new TempFile();
             await File.WriteAllTextAsync(metadataTempFile.FilePath, chapterMetadata);
 
+            var tempCopiedAudiobookPath = "temp_" + inputM4AFilePath;
             await FFmpeg.Conversions.New()
                 .AddParameter($"-i \"{inputM4AFilePath}\"")
                 .AddParameter($"-i \"{metadataTempFile.FilePath}\"")
-                .AddParameter("-c:v copy")
+                .AddParameter("-c copy") // Use copy for audio
                 .AddParameter("-map_metadata 1")
-                .SetOutput(inputM4AFilePath)
+                .SetOutput(tempCopiedAudiobookPath)
                 .SetOverwriteOutput(true)
                 .Start();
+
+            File.Replace(tempCopiedAudiobookPath, inputM4AFilePath, null); 
             
         }
 

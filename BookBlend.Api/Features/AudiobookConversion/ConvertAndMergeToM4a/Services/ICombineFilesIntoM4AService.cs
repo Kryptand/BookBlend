@@ -4,5 +4,5 @@ namespace BookBlend.Api.Features.AudiobookConversion.ConvertAndMergeToM4a.Servic
 
 public interface ICombineFilesIntoM4AService
 {
-    Task<string> MergeMp3ToM4A(IEnumerable<string> mp3Files, string outputFilePath, Audiobook audiobook);
+    Task<string> MergeMp3ToM4A(IEnumerable<string> mp3Files, Audiobook audiobook);
 }

@@ -17,6 +17,8 @@ public class AudiobookMetadataToM4AMetadataMapper : IAudiobookMetadataToM4AMetad
         var metadataBuilder = new StringBuilder();
         metadataBuilder.AppendLine(";FFMETADATA1");
         var totalMilliseconds = 0;
+        
+        var sortedChapters = audiobook.Chapters.OrderBy(c => c.Title).ToList();
 
         foreach (var chapter in audiobook.Chapters)
         {
@@ -33,7 +35,7 @@ public class AudiobookMetadataToM4AMetadataMapper : IAudiobookMetadataToM4AMetad
         return metadataBuilder.ToString();
     }
 
-    public void CopyMetadata(Audiobook sourceMetadata, string targetFile)
+    public void AddMetadataToAudiofile(Audiobook sourceMetadata, string targetFile)
     {
         var year= sourceMetadata.ReleaseDate?.Year ?? 0;
         

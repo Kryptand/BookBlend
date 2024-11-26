@@ -17,7 +17,7 @@ public sealed class MatchAudiobookFilesToAudiobooksCommandHandler(
         MatchAudiobookFilesToAudiobooksCommand request, CancellationToken cancellationToken)
     {
 
-        var persistedAudiobooks = await context.AudiobookFiles.ToListAsync(cancellationToken);
+        var persistedAudiobooks = await context.AudiobookFiles.Include(x=>x.Metadata).ToListAsync(cancellationToken);
 
         var matchedAudiobooks =
             await audiobookFilesMatcherService.MatchAudiobookFilesToAudiobooks(persistedAudiobooks);

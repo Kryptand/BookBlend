@@ -1,8 +1,9 @@
 namespace BookBlend.Api.Features.AudiobookConversion.ConvertAndMergeToM4a.Services;
 
-public class TempFile : IDisposable
+public class TempFile:IDisposable
 {
-    public string FilePath { get; } = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".tmp");
+    private const string DefaultDirectory = "/Users/andreas.goetze/RiderProjects/BookBlend/BookBlend.Api/Output";
+    public string FilePath { get; } = Path.Combine(DefaultDirectory, $"{Guid.NewGuid()}.txt");
 
     public void Dispose()
     {

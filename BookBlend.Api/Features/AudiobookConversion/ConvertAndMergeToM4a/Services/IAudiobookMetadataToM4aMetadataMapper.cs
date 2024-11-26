@@ -6,5 +6,5 @@ public interface IAudiobookMetadataToM4AMetadataMapper
 {
     string GenerateOutputFileName(Audiobook audiobook);
     string GenerateM4AMetadata(Audiobook audiobook);
-    void CopyMetadata(Audiobook sourceMetadata, string targetFile);
+    void AddMetadataToAudiofile(Audiobook sourceMetadata, string targetFile);
 }

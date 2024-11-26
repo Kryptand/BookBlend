@@ -97,7 +97,18 @@ public sealed class ConvertAndMergeAudiobooksToM4aCommandHandler(
 
         if (!files.Any()) return;
 
-        await combineFilesIntoM4AService.MergeMp3ToM4A(files, outputDirectory, audiobook);
+        var tempLocation = await combineFilesIntoM4AService.MergeMp3ToM4A(files, audiobook);
+        
+        try
+        {
+            var outputFilePath = Path.Combine(outputDirectory, $"{audiobook.Title}.m4a");
+            File.Move(tempLocation, outputFilePath);
+        }
+        catch (Exception ex)
+        {
+            File.Delete(tempLocation);
+            throw new Exception("Failed to move the file to the output directory", ex);
+        }
     }
 
     private async Task UpdateConversionJobStatus(

@@ -8,28 +8,31 @@ public sealed class CombineFilesIntoM4AService(
     IAudiobookMetadataToM4AMetadataMapper metadataService,
     ILogger<CombineFilesIntoM4AService> logger) : ICombineFilesIntoM4AService
 {
-    public async Task<string> MergeMp3ToM4A(IEnumerable<string> mp3Files, string outputFilePath, Audiobook audiobook)
+    public async Task<string> MergeMp3ToM4A(IEnumerable<string> mp3Files, Audiobook audiobook)
     {
-        var stopwatch = Stopwatch.StartNew();
         var m4APartPaths = new List<string>();
+        
+        var tempDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Output");
+        
+        if (!Directory.Exists(tempDirectory))
+        {
+            Directory.CreateDirectory(tempDirectory);
+        }
+        
+        var outputFilePath = tempDirectory;
         try
         {
             var outputFullPath = GetOutputFullPath(outputFilePath, audiobook);
 
-            logger.LogInformation("Converting MP3 files to M4A.");
             await ConvertMp3FilesToM4A(mp3Files, m4APartPaths, outputFilePath);
 
-            logger.LogInformation("Concatenating M4A files.");
             await ffmpegService.ConcatenateM4AFiles(m4APartPaths, outputFullPath);
 
-            logger.LogInformation("Adding metadata to M4A file.");
             var chapterMetadata = metadataService.GenerateM4AMetadata(audiobook);
-            await ffmpegService.AddMetadataToM4A(outputFullPath, chapterMetadata);
-
-            metadataService.CopyMetadata(audiobook, outputFullPath);
-
-            stopwatch.Stop();
-            logger.LogInformation($"MergeMp3ToM4A executed in {stopwatch.Elapsed}.");
+            
+            await ffmpegService.AddChapterMarksToM4A(outputFullPath, chapterMetadata);
+            
+            metadataService.AddMetadataToAudiofile(audiobook, outputFullPath);
 
             return outputFullPath;
         }
@@ -37,6 +40,13 @@ public sealed class CombineFilesIntoM4AService(
         {
             logger.LogError(ex, "An error occurred during the MP3 to M4A merge process.");
             throw;
+        }
+        finally
+        {
+            foreach (var m4APartPath in m4APartPaths)
+            {
+                File.Delete(m4APartPath);
+            }
         }
     }
 
