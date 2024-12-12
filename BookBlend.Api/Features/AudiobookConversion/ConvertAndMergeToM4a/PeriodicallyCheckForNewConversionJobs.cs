@@ -34,7 +34,7 @@ public class PeriodicallyCheckForNewConversionJobs(
 
         foreach (var conversionJob in conversionJobs)
         {
-            var command = new ConvertAndMergeAudiobooksToM4aCommand { ConversionJobId = conversionJob.Id };
+            var command = new ConvertAndMergeAudiobooksToM4ACommand { ConversionJobId = conversionJob.Id };
             await sender.Send(command, stoppingToken);
                 
             logger.LogInformation($"Conversion job {conversionJob.Id} has been started");

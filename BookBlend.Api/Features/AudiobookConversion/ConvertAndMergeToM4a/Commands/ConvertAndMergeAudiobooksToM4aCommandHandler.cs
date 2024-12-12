@@ -8,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookBlend.Api.Features.AudiobookConversion.ConvertAndMergeToM4a.Commands;
 
-public sealed class ConvertAndMergeAudiobooksToM4aCommandHandler(
+public sealed class ConvertAndMergeAudiobooksToM4ACommandHandler(
     ICombineFilesIntoM4AService combineFilesIntoM4AService,
-    IValidator<ConvertAndMergeAudiobooksToM4aCommand> validator,
-    AudiobookDbContext dbContext) : IRequestHandler<ConvertAndMergeAudiobooksToM4aCommand, Result>
+    IValidator<ConvertAndMergeAudiobooksToM4ACommand> validator,
+    AudiobookDbContext dbContext) : IRequestHandler<ConvertAndMergeAudiobooksToM4ACommand, Result>
 {
-    public async Task<Result> Handle(ConvertAndMergeAudiobooksToM4aCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(ConvertAndMergeAudiobooksToM4ACommand request, CancellationToken cancellationToken)
     {
         var validationResult = validator.Validate(request);
         if (!validationResult.IsValid)

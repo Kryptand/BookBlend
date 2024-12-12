@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace BookBlend.Api.Features.AudiobookConversion.ConvertAndMergeToM4a.Commands;
 
-public sealed class ConvertAndMergeAudiobooksToM4aCommandValidator : AbstractValidator<ConvertAndMergeAudiobooksToM4aCommand>
+public sealed class ConvertAndMergeAudiobooksToM4ACommandValidator : AbstractValidator<ConvertAndMergeAudiobooksToM4ACommand>
 {
-    public ConvertAndMergeAudiobooksToM4aCommandValidator()
+    public ConvertAndMergeAudiobooksToM4ACommandValidator()
     {
         RuleFor(x => x.ConversionJobId)
             .NotEmpty();
